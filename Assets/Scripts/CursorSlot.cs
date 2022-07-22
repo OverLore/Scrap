@@ -56,12 +56,13 @@ public class CursorSlot : Viewable
 
             return;
         }
-
-        amountText.text = item.currentAmount.ToString();
+        
         itemImage.sprite = item.icon;
-
         itemImage.SetAlpha(1);
-        amountImage.SetAlpha(1);
+
+        //Don't show amount icon and text if item is not stackable
+        amountImage.SetAlpha(item.maxStackSize > 1 ? 1 : 0);
+        amountText.text = item.maxStackSize > 1 ? item.currentAmount.ToString() : String.Empty;
         
         UpdatePosition();
     }

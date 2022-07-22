@@ -78,6 +78,7 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
 
     void Kill()
     {
+        //TODO : Fall animation ? Give an item boost ?
         Destroy(gameObject);
     }
 

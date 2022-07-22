@@ -11,6 +11,8 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
     {
         public IHitDecallabe.HitType type;
         public GameObject impactDecal;
+        public float angleMin;
+        public float angleMax;
     }
 
     [System.Serializable]
@@ -25,7 +27,6 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
     [Header("Decal")] 
     [SerializeField] private List<ItemDecal> decals;
     [SerializeField] private float projectorOffset;
-    [SerializeField, Range(0, 180)] private float randomAngleLimits;
 
     [Space(10), Header("Gathering")]
     [SerializeField] private Item gatheredItem;
@@ -41,6 +42,17 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
         }
 
         return null;
+    }
+
+    float GetRotation(IHitDecallabe.HitType type)
+    {
+        foreach (ItemDecal decal in decals)
+        {
+            if (decal.type == type)
+                return Random.Range(decal.angleMin, decal.angleMax);
+        }
+
+        return 0;
     }
 
     int GetEfficiency(Item item)
@@ -71,7 +83,7 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
 
         go.transform.position = hit.point + hit.normal * projectorOffset;
         go.transform.LookAt(hit.point);
-        go.transform.Rotate(go.transform.forward, Random.Range(-randomAngleLimits, randomAngleLimits));
+        go.transform.Rotate(Vector3.forward, GetRotation(type));
 
         Destroy(go, 10f);
     }

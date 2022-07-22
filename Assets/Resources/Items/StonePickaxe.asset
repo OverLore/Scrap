@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b97cc92f0c98d264894ab0f4480abd73, type: 3}
-  m_Name: StoneAxe
+  m_Name: StonePickaxe
   m_EditorClassIdentifier: 
-  id: stoneaxe
-  commonName: stone axe
-  pluralName: stone axes
-  description: A scrappy axe
-  icon: {fileID: 21300000, guid: 8272029b5375eb440aa36be2ba492949, type: 3}
+  id: stonepickaxe
+  commonName: stone pickaxe
+  pluralName: stone pickaxes
+  description: A scrappy pickaxe
+  icon: {fileID: 21300000, guid: d218b230a8c673445bb27d21ee047c02, type: 3}
   pickMessage: Pick up a %item_name%
   maxStackSize: 1
   currentAmount: 0
   isDroppable: 0
   dropObject: {fileID: 0}
   isHoldable: 1
-  inHandObject: {fileID: 3410962954731334609, guid: 38837c6dca09aac4396e3ee52a200453,
+  inHandObject: {fileID: 6586702988382449598, guid: 78f8c46174bd8a14dba3bdcacb505cff,
     type: 3}
   isUsedAsFood: 0
   feedValue: 0

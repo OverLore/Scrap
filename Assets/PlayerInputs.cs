@@ -161,6 +161,24 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""801d1fd4-7835-464f-a33c-98a4c2cf89c7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Aim"",
+                    ""type"": ""Button"",
+                    ""id"": ""4b649600-eda5-49a6-9c60-77f6f34f7afd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -372,6 +390,28 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                     ""action"": ""Slot7"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""380755f2-d600-45cd-8756-d6ee143f56d0"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f9bff92-5695-4c02-8799-2a61948b9236"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Aim"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -412,6 +452,8 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
         m_PlayerGround_Slot5 = m_PlayerGround.FindAction("Slot5", throwIfNotFound: true);
         m_PlayerGround_Slot6 = m_PlayerGround.FindAction("Slot6", throwIfNotFound: true);
         m_PlayerGround_Slot7 = m_PlayerGround.FindAction("Slot7", throwIfNotFound: true);
+        m_PlayerGround_Fire = m_PlayerGround.FindAction("Fire", throwIfNotFound: true);
+        m_PlayerGround_Aim = m_PlayerGround.FindAction("Aim", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -486,6 +528,8 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerGround_Slot5;
     private readonly InputAction m_PlayerGround_Slot6;
     private readonly InputAction m_PlayerGround_Slot7;
+    private readonly InputAction m_PlayerGround_Fire;
+    private readonly InputAction m_PlayerGround_Aim;
     public struct PlayerGroundActions
     {
         private @PlayerInputs m_Wrapper;
@@ -505,6 +549,8 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
         public InputAction @Slot5 => m_Wrapper.m_PlayerGround_Slot5;
         public InputAction @Slot6 => m_Wrapper.m_PlayerGround_Slot6;
         public InputAction @Slot7 => m_Wrapper.m_PlayerGround_Slot7;
+        public InputAction @Fire => m_Wrapper.m_PlayerGround_Fire;
+        public InputAction @Aim => m_Wrapper.m_PlayerGround_Aim;
         public InputActionMap Get() { return m_Wrapper.m_PlayerGround; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -559,6 +605,12 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                 @Slot7.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnSlot7;
                 @Slot7.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnSlot7;
                 @Slot7.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnSlot7;
+                @Fire.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnFire;
+                @Fire.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnFire;
+                @Fire.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnFire;
+                @Aim.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnAim;
+                @Aim.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnAim;
+                @Aim.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnAim;
             }
             m_Wrapper.m_PlayerGroundActionsCallbackInterface = instance;
             if (instance != null)
@@ -608,6 +660,12 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                 @Slot7.started += instance.OnSlot7;
                 @Slot7.performed += instance.OnSlot7;
                 @Slot7.canceled += instance.OnSlot7;
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
+                @Aim.started += instance.OnAim;
+                @Aim.performed += instance.OnAim;
+                @Aim.canceled += instance.OnAim;
             }
         }
     }
@@ -638,5 +696,7 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
         void OnSlot5(InputAction.CallbackContext context);
         void OnSlot6(InputAction.CallbackContext context);
         void OnSlot7(InputAction.CallbackContext context);
+        void OnFire(InputAction.CallbackContext context);
+        void OnAim(InputAction.CallbackContext context);
     }
 }

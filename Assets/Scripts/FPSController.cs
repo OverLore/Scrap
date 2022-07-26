@@ -4,7 +4,9 @@ using UnityEngine;
 public class FPSController : MonoBehaviour
 {
     public bool CanMove => true;
-    public bool IsSprinting => InputManager.Instance.Input.PlayerGround.Sprint.ReadValue<float>() > .3f && !IsCrouching;
+    public bool IsAiming => InputManager.Instance.Input.PlayerGround.Aim.ReadValue<float>() > .3f;
+    public bool IsTryingToSprint => InputManager.Instance.Input.PlayerGround.Sprint.ReadValue<float>() > .3f;
+    public bool IsSprinting => IsTryingToSprint && !IsCrouching && !IsAiming;
     public bool IsCrouching => InputManager.Instance.Input.PlayerGround.Crouch.ReadValue<float>() > .3f;
 
     [Header("Movement settings")]

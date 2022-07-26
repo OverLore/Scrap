@@ -184,7 +184,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116949566699220692}
   m_LocalRotation: {x: -0.5066203, y: -0.68344593, z: 0.3314707, w: -0.40787837}
-  m_LocalPosition: {x: 0.22832, y: 1.55, z: 14.226}
+  m_LocalPosition: {x: 0.22832, y: -0.67, z: 14.23}
   m_LocalScale: {x: 0.9999998, y: 0.9999998, z: 0.9999999}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1476,6 +1476,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 1833569486919677823}
   owner: {fileID: 0}
+  pivot: {fileID: 7092354685988076533}
+  sprintSpeedX: 14
+  sprintSpeedY: 26
+  sprintForce: 0.08
+  walkSpeedX: 7
+  walkSpeedY: 13
+  walkForce: 0.017
+  crouchSpeedX: 6.5
+  crouchSpeedY: 11
+  crouchForce: 0.012
 --- !u!1 &7414663399774172089
 GameObject:
   m_ObjectHideFlags: 0

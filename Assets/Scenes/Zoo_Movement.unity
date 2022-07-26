@@ -8101,16 +8101,6 @@ PrefabInstance:
       propertyPath: owner
       value: 
       objectReference: {fileID: 922867669}
-    - target: {fileID: 2557315533281637092, guid: 63105158792b65a44807323c35dc3832,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.67
-      objectReference: {fileID: 0}
-    - target: {fileID: 2557315533281637092, guid: 63105158792b65a44807323c35dc3832,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 14.23
-      objectReference: {fileID: 0}
     - target: {fileID: 7092354685988076533, guid: 63105158792b65a44807323c35dc3832,
         type: 3}
       propertyPath: m_Name

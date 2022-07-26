@@ -6,6 +6,7 @@ public class FPSController : MonoBehaviour
     public bool CanMove => true;
     public bool IsAiming => InputManager.Instance.Input.PlayerGround.Aim.ReadValue<float>() > .3f;
     public bool IsTryingToSprint => InputManager.Instance.Input.PlayerGround.Sprint.ReadValue<float>() > .3f;
+    public bool IsWalking => InputManager.Instance.Input.PlayerGround.Movement.ReadValue<Vector2>() != Vector2.zero;
     public bool IsSprinting => IsTryingToSprint && !IsCrouching && !IsAiming;
     public bool IsCrouching => InputManager.Instance.Input.PlayerGround.Crouch.ReadValue<float>() > .3f;
 

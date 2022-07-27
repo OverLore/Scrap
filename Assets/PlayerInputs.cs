@@ -46,7 +46,7 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""Reload"",
                     ""type"": ""Button"",
                     ""id"": ""ee964a1d-b7f2-4da3-bf25-ecf9528fb00c"",
                     ""expectedControlType"": ""Button"",
@@ -251,11 +251,11 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""148ed7c5-27ef-4ca3-849e-54f60232bebd"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""MouseKeyboard"",
-                    ""action"": ""New action"",
+                    ""action"": ""Reload"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -439,7 +439,7 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
         m_PlayerGround = asset.FindActionMap("PlayerGround", throwIfNotFound: true);
         m_PlayerGround_Movement = m_PlayerGround.FindAction("Movement", throwIfNotFound: true);
         m_PlayerGround_Jump = m_PlayerGround.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerGround_Newaction = m_PlayerGround.FindAction("New action", throwIfNotFound: true);
+        m_PlayerGround_Reload = m_PlayerGround.FindAction("Reload", throwIfNotFound: true);
         m_PlayerGround_Look = m_PlayerGround.FindAction("Look", throwIfNotFound: true);
         m_PlayerGround_Sprint = m_PlayerGround.FindAction("Sprint", throwIfNotFound: true);
         m_PlayerGround_Crouch = m_PlayerGround.FindAction("Crouch", throwIfNotFound: true);
@@ -515,7 +515,7 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
     private IPlayerGroundActions m_PlayerGroundActionsCallbackInterface;
     private readonly InputAction m_PlayerGround_Movement;
     private readonly InputAction m_PlayerGround_Jump;
-    private readonly InputAction m_PlayerGround_Newaction;
+    private readonly InputAction m_PlayerGround_Reload;
     private readonly InputAction m_PlayerGround_Look;
     private readonly InputAction m_PlayerGround_Sprint;
     private readonly InputAction m_PlayerGround_Crouch;
@@ -536,7 +536,7 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
         public PlayerGroundActions(@PlayerInputs wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_PlayerGround_Movement;
         public InputAction @Jump => m_Wrapper.m_PlayerGround_Jump;
-        public InputAction @Newaction => m_Wrapper.m_PlayerGround_Newaction;
+        public InputAction @Reload => m_Wrapper.m_PlayerGround_Reload;
         public InputAction @Look => m_Wrapper.m_PlayerGround_Look;
         public InputAction @Sprint => m_Wrapper.m_PlayerGround_Sprint;
         public InputAction @Crouch => m_Wrapper.m_PlayerGround_Crouch;
@@ -566,9 +566,9 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                 @Jump.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnJump;
-                @Newaction.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnNewaction;
+                @Reload.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnReload;
+                @Reload.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnReload;
+                @Reload.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnReload;
                 @Look.started -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnLook;
                 @Look.performed -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnLook;
                 @Look.canceled -= m_Wrapper.m_PlayerGroundActionsCallbackInterface.OnLook;
@@ -621,9 +621,9 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
+                @Reload.started += instance.OnReload;
+                @Reload.performed += instance.OnReload;
+                @Reload.canceled += instance.OnReload;
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
@@ -683,7 +683,7 @@ public partial class @PlayerInputs : IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnReload(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);

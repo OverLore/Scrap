@@ -4,17 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Gatherable : MonoBehaviour, IHitDecallabe
+public class Gatherable : DecallableElement
 {
-    [System.Serializable]
-    class ItemDecal
-    {
-        public IHitDecallabe.HitType type;
-        public GameObject impactDecal;
-        public float angleMin;
-        public float angleMax;
-    }
-
     [System.Serializable]
     class ItemEfficiency
     {
@@ -24,36 +15,10 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
         public int damage;
     }
 
-    [Header("Decal")] 
-    [SerializeField] private List<ItemDecal> decals;
-    [SerializeField] private float projectorOffset;
-
     [Space(10), Header("Gathering")]
     [SerializeField] private Item gatheredItem;
     [SerializeField] private int life;
     [SerializeField] private List<ItemEfficiency> usableTools;
-
-    GameObject GetDecal(IHitDecallabe.HitType type)
-    {
-        foreach (ItemDecal decal in decals)
-        {
-            if (decal.type == type)
-                return decal.impactDecal;
-        }
-
-        return null;
-    }
-
-    float GetRotation(IHitDecallabe.HitType type)
-    {
-        foreach (ItemDecal decal in decals)
-        {
-            if (decal.type == type)
-                return Random.Range(decal.angleMin, decal.angleMax);
-        }
-
-        return 0;
-    }
 
     int GetEfficiency(Item item)
     {
@@ -77,17 +42,6 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
         return 0;
     }
 
-    public void SetDecal(RaycastHit hit, IHitDecallabe.HitType type)
-    {
-        GameObject go = Instantiate(GetDecal(type));
-
-        go.transform.position = hit.point + hit.normal * projectorOffset;
-        go.transform.LookAt(hit.point);
-        go.transform.Rotate(Vector3.forward, GetRotation(type));
-
-        Destroy(go, 10f);
-    }
-
     void Kill()
     {
         //TODO : Fall animation ? Give an item boost ?
@@ -103,7 +57,7 @@ public class Gatherable : MonoBehaviour, IHitDecallabe
 
         if (amountToGive == 0)
         {
-            //TODO: Show a message to inform player that hé is using a wrong tool
+            //TODO: Show a message to inform player that he is using a wrong tool
         }
 
         if (usedItem.hasDurability)

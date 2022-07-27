@@ -24,7 +24,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "New action",
+                    "name": "Reload",
                     "type": "Button",
                     "id": "ee964a1d-b7f2-4da3-bf25-ecf9528fb00c",
                     "expectedControlType": "Button",
@@ -229,11 +229,11 @@
                 {
                     "name": "",
                     "id": "148ed7c5-27ef-4ca3-849e-54f60232bebd",
-                    "path": "",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "MouseKeyboard",
-                    "action": "New action",
+                    "action": "Reload",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

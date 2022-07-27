@@ -6,15 +6,17 @@ using UnityEngine.InputSystem;
 
 public class Axes : HoldableItem
 {
-    [SerializeField] private Animator animator;
-
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
+
         animator.SetTrigger("Equip");
     }
 
-    private void Update()
+    public override void Update()
     {
+        base.Update();
+
         animator.SetBool("Enabled", Mouse.current.leftButton.isPressed);
     }
 

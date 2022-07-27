@@ -194,12 +194,24 @@ public class FPSController : MonoBehaviour
         m_controller.center = Vector3.Lerp(standCenter, crouchCenter, crouchAdvancement);
     }
 
+    public void ForceMoveLook(Vector2 offset)
+    {
+        if (offset == Vector2.zero)
+            return;
+
+        m_yRot -= offset.y;
+        m_yRot = Mathf.Clamp(m_yRot, lookLimitDown, lookLimitUp);
+
+        m_playerCam.transform.localRotation = Quaternion.Euler(m_yRot, 0, 0);
+        transform.rotation *= Quaternion.Euler(0, offset.x * lookSpeedX, 0);
+    }
+
     void HandleInteractableRayCast()
     {
         if (view.IsEnabled)
             return;
 
-        if (Physics.Raycast(m_playerCam.transform.position, m_playerCam.transform.forward, out RaycastHit hit, 2, interactionLayers))
+        if (Physics.Raycast(m_playerCam.transform.position, m_playerCam.transform.forward, out RaycastHit hit, 3.5f, interactionLayers))
         {
             IInteractable interact = hit.transform.gameObject.GetComponent<IInteractable>();
 

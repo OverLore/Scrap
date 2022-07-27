@@ -2,6 +2,15 @@ using UnityEngine;
 
 public interface IHitDecallabe
 {
+    [System.Serializable]
+    public class ItemDecal
+    {
+        public IHitDecallabe.HitType type;
+        public GameObject impactDecal;
+        public float angleMin;
+        public float angleMax;
+    }
+
     public enum HitType
     {
         Axe,

@@ -7,6 +7,7 @@ public class Weapon : HoldableItem
     [Space(10), Header("Weapon")]
     [SerializeField] private TextAsset recoilFile;
     [SerializeField] private GameObject bullet;
+    [SerializeField] private Item bulletItem;
     [SerializeField] private Transform pivot;
     [SerializeField] private float cadence;
     [SerializeField] private int magazineSize;
@@ -63,7 +64,7 @@ public class Weapon : HoldableItem
 
     void ValidateReload()
     {
-        magazineContent = magazineSize;
+        magazineContent += owner.GetInventory().RemoveItems(bulletItem, magazineSize - magazineContent);
     }
 
     void HandleReload()
@@ -75,6 +76,7 @@ public class Weapon : HoldableItem
             return;
 
         //TODO: Start an animation who call ValidateReload()
+        ValidateReload();
     }
 
     void HandleRecoilAnim()

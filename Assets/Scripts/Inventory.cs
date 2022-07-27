@@ -86,6 +86,45 @@ public class Inventory : Viewable
         }
     }
 
+    public int RemoveItems(Item item, int amount)
+    {
+        if (!item || slots.Count <= 0 || amount <= 0)
+        {
+            return 0;
+        }
+
+        int removeItemAmount = 0;
+
+        while (amount > 0)
+        {
+            Slot slotFound = null;
+
+            slotFound = slots.FirstOrDefault(
+                slot => slot.GetItem() != null
+                        && slot.GetItem().id == item.id);
+
+            if (slotFound == null)
+            {
+                slotFound = Owner.GetHotbar().slots.FirstOrDefault(
+                    slot => slot.GetItem() != null
+                            && slot.GetItem().id == item.id);
+
+                if (slotFound == null)
+                    return removeItemAmount;
+            }
+
+            int toRemove = Mathf.Min(slotFound.GetItem().currentAmount, amount);
+            slotFound.GetItem().currentAmount -= toRemove;
+
+            slotFound.Refresh();
+
+            amount -= amount;
+            removeItemAmount += toRemove;
+        }
+
+        return removeItemAmount;
+    }
+
     public int AddItem(Item item)
     {
         if (!item || slots.Count <= 0)

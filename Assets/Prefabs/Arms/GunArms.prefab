@@ -1491,6 +1491,7 @@ MonoBehaviour:
   mouseSensibility: 2
   recoilFile: {fileID: 4900000, guid: 0ed8f3b75f6f29d4b8606298e2c7d882, type: 3}
   bullet: {fileID: 5999905000559589086, guid: 4c8478a553dd6dc4e98cc939a05041bb, type: 3}
+  bulletItem: {fileID: 11400000, guid: ff2c954380714a643879150edb8c0969, type: 2}
   pivot: {fileID: 7576967371648475471}
   cadence: 0.133
   magazineSize: 30

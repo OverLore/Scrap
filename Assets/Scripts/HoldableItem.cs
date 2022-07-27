@@ -81,6 +81,14 @@ public class HoldableItem : MonoBehaviour
         xRotationOffset = Mathf.Clamp(xRotationOffset, xRotationLimits.x, xRotationLimits.y);
         yRotationOffset = Mathf.Clamp(yRotationOffset, yRotationLimits.x, yRotationLimits.y);
 
+        if (owner.IsViewEnable)
+        {
+            xRotationOffset = 0;
+            yRotationOffset = 0;
+
+            return origin;
+        }
+
         if (owner.IsSprinting && owner.IsMoving)
         {
             xOffset = Mathf.Cos(Time.time * sprintSpeedX) * sprintForce;

@@ -72,6 +72,9 @@ public class Weapon : HoldableItem
         if (!InputManager.Instance.Input.PlayerGround.Reload.triggered)
             return;
 
+        if (owner.IsViewEnable)
+            return;
+
         if (magazineContent == magazineSize)
             return;
 
@@ -92,7 +95,7 @@ public class Weapon : HoldableItem
         if (nextShot > 0)
             nextShot -= Time.deltaTime;
 
-        if (InputManager.Instance.Input.PlayerGround.Fire.ReadValue<float>() < .3f || magazineContent < 1)
+        if (InputManager.Instance.Input.PlayerGround.Fire.ReadValue<float>() < .3f || magazineContent < 1 || owner.IsViewEnable)
         {
             recoilStep = 0;
 
@@ -139,6 +142,14 @@ public class Weapon : HoldableItem
 
         xRotationOffset = Mathf.Clamp(xRotationOffset, xRotationLimits.x, xRotationLimits.y);
         yRotationOffset = Mathf.Clamp(yRotationOffset, yRotationLimits.x, yRotationLimits.y);
+
+        if (owner.IsViewEnable)
+        {
+            xRotationOffset = 0;
+            yRotationOffset = 0;
+
+            return origin;
+        }
 
         if (owner.IsSprinting && owner.IsMoving)
         {

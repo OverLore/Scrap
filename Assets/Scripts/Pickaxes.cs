@@ -16,7 +16,7 @@ public class Pickaxes : HoldableItem
     {
         base.Update();
 
-        animator.SetBool("Enabled", Mouse.current.leftButton.isPressed);
+        animator.SetBool("Enabled", Mouse.current.leftButton.isPressed && !owner.IsViewEnable);
     }
 
     public void Hit()

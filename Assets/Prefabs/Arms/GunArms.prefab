@@ -1486,6 +1486,11 @@ MonoBehaviour:
   crouchSpeedX: 6.5
   crouchSpeedY: 11
   crouchForce: 0.012
+  xRotationForce: 4
+  yRotationForce: 2
+  mouseSensibility: 2
+  xRotationLimits: {x: -4, y: 4}
+  yRotationLimits: {x: -4, y: 4}
 --- !u!1 &7414663399774172089
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,10 +3,12 @@ using UnityEngine;
 
 public class FPSController : MonoBehaviour
 {
+    public Vector2 Sensibility => new Vector2(lookSpeedX, lookSpeedY);
     public bool CanMove => true;
     public bool IsAiming => InputManager.Instance.Input.PlayerGround.Aim.ReadValue<float>() > .3f;
+    public bool IsMoving => InputManager.Instance.Input.PlayerGround.Movement.ReadValue<Vector2>() != Vector2.zero;
     public bool IsTryingToSprint => InputManager.Instance.Input.PlayerGround.Sprint.ReadValue<float>() > .3f;
-    public bool IsWalking => InputManager.Instance.Input.PlayerGround.Movement.ReadValue<Vector2>() != Vector2.zero;
+    public bool IsWalking => IsMoving && !IsCrouching && !IsSprinting;
     public bool IsSprinting => IsTryingToSprint && !IsCrouching && !IsAiming;
     public bool IsCrouching => InputManager.Instance.Input.PlayerGround.Crouch.ReadValue<float>() > .3f;
 

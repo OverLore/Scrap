@@ -9,30 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b97cc92f0c98d264894ab0f4480abd73, type: 3}
+  m_Script: {fileID: 11500000, guid: ab529f07d543184428dba1eb26f337fe, type: 3}
   m_Name: Wood
   m_EditorClassIdentifier: 
   id: wood
-  commonName: wood
-  pluralName: woods
-  description: A simple piece of a tree
-  icon: {fileID: 21300000, guid: edc424c1cc2f4d14489cd1425b0a3455, type: 3}
-  pickMessage: Pick up x%item_amount% %item_name%
-  isStackable: 1
-  maxStackSize: 100
-  currentAmount: 0
-  isDroppable: 0
-  dropObject: {fileID: 0}
-  isHoldable: 0
+  displayName: Wood
+  description: A simple piece of wood
+  icon: {fileID: 21300000, guid: 8ee781dd5d4ed3943893693046f66849, type: 3}
+  data: 
   inHandObject: {fileID: 0}
-  isUsedAsFood: 0
-  feedValue: 0
-  isUsedAsEquipment: 0
-  asEquipmentProtection: 0
-  hasDurability: 0
+  onFloorObject: {fileID: 6931898274405607737, guid: d7e29c41678f14444a19fa7fb4302ff0,
+    type: 3}
+  maxStackAmount: 100
+  currentStackAmount: 100
   maxDurability: 0
   currentDurability: 0
-  isCraftable: 0
-  craftRecipe: 
-  isBakeable: 0
-  bakeResult: 

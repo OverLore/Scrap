@@ -2,75 +2,73 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class Notification : MonoBehaviour
 {
-    public bool IsAlive => HasTimer ? timer > 0 : IsPersistent || lifeTime > 0;
+    public enum Type
+    {
+        Info,
+        Warning,
+        Error,
+        Inventory,
+        Crafting,
+        Tip,
+        DebugWarning,
+        DebugError
+    }
 
-    public bool IsPersistent = false;
-    public bool HasTimer = false;
-
-    [SerializeField] private TMP_Text titleText;
+    [Header("References")]
+    [SerializeField] private TMP_Text bodyText;
     [SerializeField] private TMP_Text valueText;
-    [SerializeField] private Animator animator;
+    [SerializeField] private Type type;
 
-    private string title;
-    private string value;
-    private float timer;
-    private string format;
-    private float lifeTime = 5f;
+    public Action onEachSecond;
 
-    void Refresh()
+    public float timer;
+
+    void Awake()
     {
-        titleText.text = title;
-        valueText.text = HasTimer ? format.Replace("%time%", ((int)timer).ToString()) : value;
+        StartCoroutine(UpdateSecondTimer());
     }
 
-    private void Update()
+    void Update()
     {
-        if (HasTimer)
-            timer -= Time.deltaTime;
-        else if (!IsPersistent)
-            lifeTime -= Time.deltaTime;
+        timer -= Time.deltaTime;
 
-        Refresh();
+        if (timer <= 0)
+            Destroy(gameObject);
     }
 
-    public void Kill()
+    public Notification Setup(string _body, string _value, float _timer)
     {
-        animator.SetTrigger("Depop");
-        Destroy(gameObject, 1f);
+        bodyText.text = _body;
+        valueText.text = _value;
+        timer = _timer;
+
+        return this;
+    }
+    
+    public Notification AddOnEachSecond(Action _action)
+    {
+        onEachSecond += _action;
+
+        return this;
     }
 
-    public void SetupPersistent(string _title, string _value)
+    public void SetValue(string _text)
     {
-        IsPersistent = true;
-
-        title = _title;
-        value = _value;
-
-        Refresh();
+        valueText.text = _text;
     }
 
-    public void SetupTimed(string _title, string _value, float time, string _format)
+    IEnumerator UpdateSecondTimer()
     {
-        HasTimer = true;
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
 
-        title = _title;
-        value = _value;
-        timer = time;
-        format = _format;
-
-        Refresh();
+            onEachSecond?.Invoke();
+        }
     }
 
-    public void Setup(string _title, string _value)
-    {
-        title = _title;
-        value = _value;
-
-        Refresh();
-    }
 }

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab529f07d543184428dba1eb26f337fe, type: 3}
+  m_Name: Metal Hatchet
+  m_EditorClassIdentifier: 
+  id: metal_hatchet
+  displayName: Metal hatchet
+  description: A good wood cutting tool
+  icon: {fileID: 21300000, guid: be21e3413ebd04043a5eb2b5e9be2a57, type: 3}
+  data: 
+  inHandObject: {fileID: 7102374006042501026, guid: b7ca31e8000b1de4e83ec07cfaeed062,
+    type: 3}
+  onFloorObject: {fileID: 3440297109482192164, guid: 7363ddd57296dfb4a84e89dadc305313,
+    type: 3}
+  maxStackAmount: 1
+  currentStackAmount: 1
+  maxDurability: 0
+  currentDurability: 0

@@ -1,18 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+public class InputManager
 {
-    public static InputManager Instance;
-    public PlayerInputs Input { get; private set; }
+    private PlayerInputs m_inputs;
+    public PlayerInputs Inputs {
+        get {
+            if (m_inputs == null)
+            {
+                m_inputs = new PlayerInputs();
+                m_inputs.Enable();
+            }
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-
-            Input = new PlayerInputs();
-            Input.Enable();
+            return m_inputs;
         }
+    }
+
+    public void Init()
+    {
+        m_inputs = new PlayerInputs();
+        m_inputs.Enable();
     }
 }

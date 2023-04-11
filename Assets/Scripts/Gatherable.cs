@@ -1,83 +1,216 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class Gatherable : DecallableElement
+public class Gatherable : MonoBehaviour, ISaveable<Gatherable.GatherableData>
 {
     [System.Serializable]
-    class ItemEfficiency
+    public struct AvailableTool
     {
-        public Item item;
-        public int minItemAmount;
-        public int maxItemAmount;
-        public int damage;
+        public Item tool;
+        public float efficiency;
     }
 
-    [Space(10), Header("Gathering")]
-    [SerializeField] private Item gatheredItem;
-    [SerializeField] private int life;
-    [SerializeField] private List<ItemEfficiency> usableTools;
-
-    int GetEfficiency(Item item)
+    [System.Serializable]
+    public struct GatherableItem
     {
-        foreach (ItemEfficiency eff in usableTools)
+        public Item resource;
+        public int chance;
+        public int dropAmount;
+    }
+
+    [System.Serializable]
+    public struct AvailableToolData
+    {
+        public Item.ItemData tool;
+        public float efficiency;
+    }
+
+    [System.Serializable]
+    public struct GatherableItemData
+    {
+        public Item.ItemData resource;
+        public int chance;
+        public int dropAmount;
+    }
+
+    [System.Serializable]
+    public struct GatherableData
+    {
+        public int availableToolsAmount;
+        public List<AvailableToolData> availableTools;
+        public int itemPoolAmount;
+        public List<GatherableItemData> itemPool;
+        public int life;
+        public Vector3 position;
+        public Vector3 rotation;
+        public string id;
+    }
+
+    [Header("Settings")]
+    [SerializeField] public string id;
+
+    [Header("Tools")]
+    [SerializeField] List<AvailableTool> availableTools = new List<AvailableTool>();
+
+    [Header("Gathering")]
+    [SerializeField] int life;
+    [SerializeField] List<GatherableItem> itemPool = new List<GatherableItem>();
+
+    [Header("FX")]
+    public GameObject breakFX;
+
+    public virtual Item Gather(Item tool)
+    {
+        if (tool == null)
+            return null;
+
+        AvailableTool availableTool = availableTools.Find(x => x.tool.id == tool.id);
+
+        if (availableTool.tool == null)
+            return null;
+
+        int totalChance = 0;
+        foreach (GatherableItem item in itemPool)
+            totalChance += item.chance;
+
+        int random = Random.Range(0, totalChance);
+
+        Item it = null;
+
+        int currentChance = 0;
+        foreach (GatherableItem item in itemPool)
         {
-            if (eff.item.id == item.id)
-                return Random.Range(eff.minItemAmount, eff.maxItemAmount);
+            currentChance += item.chance;
+
+            if (random <= currentChance)
+            {
+                int amount = (int)(availableTool.efficiency * item.dropAmount);
+                if (amount == 0)
+                    amount = 1;
+                it = Instantiate(item.resource);
+                it.currentStackAmount = amount;
+                
+                Item rest = InventoryController.Instance.inventory.AddItem(it);
+                if (rest != null)
+                    Debug.LogError("TODO : Drop rest item");
+                
+                break;
+            }
         }
 
-        return 0;
+        life--;
+
+        if (life <= 0)
+            Break();
+
+        return it;
     }
 
-    int GetDamage(Item item)
+    protected void Break()
     {
-        foreach (ItemEfficiency eff in usableTools)
-        {
-            if (eff.item.id == item.id)
-                return eff.damage;
-        }
-
-        return 0;
-    }
-
-    void Kill()
-    {
-        //TODO : Fall animation ? Give an item boost ?
         Destroy(gameObject);
     }
 
-    public void Gather(FPSController player)
+    private void OnDestroy()
     {
-        Slot usedSlot = player.GetHotbar().CurrentSlot;
-        Item usedItem = usedSlot.GetItem();
+        GatherableManager.Instance.gatherableList.Remove(this);
+    }
 
-        int amountToGive = Mathf.Min(GetEfficiency(usedItem), life);
+    List<AvailableToolData> AvailableToolsToData()
+    {
+        List<AvailableToolData> datas = new List<AvailableToolData>();
 
-        if (amountToGive == 0)
+        foreach (var tool in availableTools)
         {
-            //TODO: Show a message to inform player that he is using a wrong tool
+            AvailableToolData data = new AvailableToolData();
+
+            data.efficiency = tool.efficiency;
+            data.tool = tool.tool.CreateSaveData();
+
+            datas.Add(data);
         }
 
-        if (usedItem.hasDurability)
-        {
-            usedItem.currentDurability--;
+        return datas;
+    }
 
-            usedSlot.Refresh();
+    void DataToAvailableTools(List<AvailableToolData> data, int amount)
+    {
+        availableTools = new List<AvailableTool>();
+
+        for (int i = 0; i < amount; i++)
+        {
+            AvailableTool tool = new AvailableTool();
+
+            tool.efficiency = data[i].efficiency;
+            tool.tool = Item.ReadSaveData(data[i].tool);
+
+            availableTools.Add(tool);
+        }
+    }
+
+    List<GatherableItemData> GatherableItemsToData()
+    {
+        List<GatherableItemData> datas = new List<GatherableItemData>();
+
+        foreach (var item in itemPool)
+        {
+            GatherableItemData data = new GatherableItemData();
+
+            data.chance = item.chance;
+            data.dropAmount = item.dropAmount;
+            data.resource = item.resource.CreateSaveData();
+
+            datas.Add(data);
         }
 
-        life -= GetDamage(usedItem);
+        return datas;
+    }
 
-        if (life < 1)
-            Kill();
+    void DataToGatherableItems(List<GatherableItemData> data, int amount)
+    {
+        itemPool = new List<GatherableItem>();
 
-        Item toAdd = Instantiate(gatheredItem);
-        gatheredItem.currentAmount = amountToGive;
+        for (int i = 0; i < amount; i++)
+        {
+            GatherableItem item = new GatherableItem();
 
-        player.GetNotificationManager().AddNotification(NotificationManager.NotificationType.Normal,
-            NotificationManager.NotificationStyle.InventoryAdd, gatheredItem.commonName, amountToGive.ToString());
+            item.chance = data[i].chance;
+            item.dropAmount = data[i].dropAmount;
+            item.resource = Item.ReadSaveData(data[i].resource);
 
-        player.GetInventory().AddItem(toAdd);
+            itemPool.Add(item);
+        }
+    }
+
+    public GatherableData CreateSaveData()
+    {
+        GatherableData data = new GatherableData();
+
+        data.availableTools = AvailableToolsToData();
+        data.availableToolsAmount = availableTools.Count;
+        data.itemPool = GatherableItemsToData();
+        data.itemPoolAmount = itemPool.Count;
+        data.life = life;
+        data.position = transform.position;
+        data.rotation = transform.rotation.eulerAngles;
+        data.id = id;
+
+        return data;
+    }
+
+    public void ReadSaveData(GatherableData _data)
+    {
+        DataToAvailableTools(_data.availableTools, _data.availableToolsAmount);
+        DataToGatherableItems(_data.itemPool, _data.itemPoolAmount);
+        life = _data.life;
+        id = _data.id;
+        transform.position = _data.position;
+        transform.rotation = Quaternion.Euler(_data.rotation);
+    }
+
+    public string GetFileName()
+    {
+         return typeof(Gatherable).ToString();
     }
 }

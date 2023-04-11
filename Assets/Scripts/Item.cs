@@ -1,93 +1,67 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Scriptables/Item/Default", fileName = "DefaultItem")]
+[CreateAssetMenu(menuName = "Scriptables/Item", fileName = "New Item"), System.Serializable]
 public class Item : ScriptableObject
 {
-    [Header("Base")]
-    public string id = string.Empty;
-    public string commonName = string.Empty;
-    public string pluralName = string.Empty;
-    [TextArea] public string description = string.Empty;
-    public Sprite icon = null;
-    public string pickMessage = string.Empty;
-
-    [Space(10), Header("Stack")]
-    [Min(1)] public int maxStackSize = 1;
-    public int currentAmount = 0;
-
-    [Space(10), Header("Drop")]
-    public bool isDroppable = false;
-    public GameObject dropObject = null;
-
-    [Space(10), Header("Hold")]
-    public bool isHoldable = false;
-    public GameObject inHandObject = null;
-
-    [Space(10), Header("Food")]
-    public bool isUsedAsFood = false;
-    public int feedValue = 0;
-
-    [Space(10), Header("Equipment")]
-    public bool isUsedAsEquipment = false;
-    public float asEquipmentProtection = 0;
-
-    [Space(10), Header("Durability")]
-    public bool hasDurability = false;
-    public int maxDurability = 0;
-    public int currentDurability = 0;
-
-    [Space(10), Header("Craft")]
-    public bool isCraftable = false;
-    [TextArea] public string craftRecipe = string.Empty;
-
-    [Space(10), Header("Furnace")]
-    public bool isBakeable = false;
-    [TextArea] public string bakeResult = string.Empty;
-
-    /// <summary>
-    /// <para><strong>Available placeholders :</strong></para>
-    /// <list type="bullet">
-    /// <item><em> %item_name% </em></item>
-    /// <item><em> %item_max_stack% </em></item>
-    /// <item><em> %item_amount%, </em></item>
-    /// <item><em> %item_durability% </em></item>
-    /// <item><em> %item_max_durability% </em></item>
-    /// <item><em> %feed_value% </em></item>
-    /// <item><em> %armor_value% </em></item>
-    /// </list>
-    /// </summary>
-    /// <returns>The description of the item replacing placeholders by values</returns>
-    public string GetFormattedDescription()
+    [System.Serializable]
+    public struct ItemData
     {
-        return description.Replace("%item_name%", currentAmount > 1 ? pluralName : commonName)
-            .Replace("%item_max_stack%", maxStackSize.ToString())
-            .Replace("%item_amount%", currentAmount.ToString())
-            .Replace("%item_durability%", currentDurability.ToString())
-            .Replace("%item_max_durability%", maxDurability.ToString())
-            .Replace("%feed_value%", feedValue.ToString())
-            .Replace("%armor_value%", Mathf.Round(asEquipmentProtection * 10).ToString());
+        public string id;
+        public int currentStackAmount;
+        public float currentDurability;
     }
 
-    /// <summary>
-    /// <para><strong>Available placeholders :</strong></para>
-    /// <list type="bullet">
-    /// <item><em> %item_name% </em></item>
-    /// <item><em> %item_amount%, </em></item>
-    /// <item><em> %item_durability% </em></item>
-    /// <item><em> %item_max_durability% </em></item>
-    /// </list>
-    /// </summary>
-    /// <returns>The pick message of the item replacing placeholders by values</returns>
-    public string GetFormattedPickMessage()
+    [Header("General")] 
+    public string id;
+    public string displayName;
+    public string description;
+    public Sprite icon;
+    public string data;
+    public GameObject inHandObject;
+    public GameObject onFloorObject;
+
+    [Header("Stack")]
+    public int maxStackAmount;
+    public int currentStackAmount;
+
+    [Header("Durability")]
+    public float maxDurability;
+    public float currentDurability;
+
+    public ItemData CreateSaveData()
     {
-        return pickMessage.Replace("%item_name%", currentAmount > 1 ? pluralName : commonName)
-            .Replace("%item_amount%", currentAmount.ToString())
-            .Replace("%item_durability%", currentDurability.ToString())
-            .Replace("%item_max_durability%", maxDurability.ToString());
+        ItemData itemData = new ItemData();
+
+        itemData.id = id;
+        itemData.currentStackAmount = currentStackAmount;
+        itemData.currentDurability = currentDurability;
+
+        return itemData;
     }
-    
-    public Item Clone()
+
+    public static ItemData CreateSaveData(Item _item)
     {
-        return (Item)MemberwiseClone();
+        ItemData itemData = new ItemData();
+
+        itemData.id = _item == null ? "null" : _item.id;
+        itemData.currentStackAmount = _item == null ? 0 : _item.currentStackAmount;
+        itemData.currentDurability = _item == null ? 0 : _item.currentDurability;
+
+        return itemData;
+    }
+
+    public static Item ReadSaveData(ItemData _itemData)
+    {
+        if (_itemData.id == "null")
+            return null;
+
+        Item item = ItemDB.instance.GetItemByID(_itemData.id);
+        
+        item.currentStackAmount = _itemData.currentStackAmount;
+        item.currentDurability = _itemData.currentDurability;
+
+        return item;
     }
 }

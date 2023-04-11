@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab529f07d543184428dba1eb26f337fe, type: 3}
+  m_Name: Stone Hatchet
+  m_EditorClassIdentifier: 
+  id: stone_hatchet
+  displayName: Stone hatchet
+  description: A scrappy wood cutting tool
+  icon: {fileID: 21300000, guid: 07592f488c981b94b9cfcb6b0f3b36c1, type: 3}
+  data: 
+  inHandObject: {fileID: 5858993671694141758, guid: c275b121f273a1945ac8f0aedd1a2019,
+    type: 3}
+  onFloorObject: {fileID: 4319924414458498324, guid: b4dd39b6107203641907ee6b418042e0,
+    type: 3}
+  maxStackAmount: 1
+  currentStackAmount: 1
+  maxDurability: 0
+  currentDurability: 0

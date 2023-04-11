@@ -8,13 +8,13 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Interactable
+  - Pickable
   - Water
   - UI
-  - NotDecallable
   - Gatherable
-  - Ignore
-  - Player
+  - Interactable
+  - 
+  - 
   - 
   - 
   - 

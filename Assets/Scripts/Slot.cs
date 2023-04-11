@@ -1,274 +1,327 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
 {
-    public bool IsEmpty => item == null || item.currentAmount < 1;
-    public bool IsFull => item != null && item.currentAmount >= item.maxStackSize;
-
-    [Header("Components")]
-    [SerializeField] private Image backgroundImage;
-    [SerializeField] private Image borderImage;
-    [SerializeField] private Image amountImage;
-    [SerializeField] private Image durabilityBarImage;
-    [SerializeField] private Image durabilityBarFillImage;
-    [SerializeField] private Image itemImage;
-    [SerializeField] private TMP_Text amountText;
-    [SerializeField] private Animator animator;
-
-    [Space(10), Header("Colors")]
-    [SerializeField] private Color normalColor;
-    [SerializeField] private Color hoverColor;
-    [SerializeField] private Color durabilityMaxColor;
-    [SerializeField] private Color durabilityMinColor;
-
-    public Action OnItemChange;
-
-    private bool m_hoverred;
-    private bool clicked;
-
-    [SerializeField] private Inventory owner;
-
-    private Item item;
-
-    private void Awake()
+    [System.Serializable]
+    public struct SlotData
     {
+        public Item.ItemData item;
+    }
+
+    public bool Empty { get { return (m_item == null || m_item.currentStackAmount <= 0); } }
+
+    [Header("References")] 
+    [SerializeField] Image iconImage;
+    [SerializeField] Image backgroundImage;
+    [SerializeField] Image durabilityImage;
+    [SerializeField] TMP_Text amountText;
+
+    [Space(10), Header("Settings")]
+    [SerializeField] Color normalColor;
+    [SerializeField] Color hoverredColor;
+    [SerializeField] Color durabilityImageColor;
+
+    [Space(10), Header("DEBUG")]
+    [SerializeField] Item DEBUG_Item;
+    [SerializeField] int DEBUG_Amount;
+
+    public Action<Slot> onSetItem;
+
+    private Item m_item;
+    private bool m_willStackAll;
+
+    private void Start()
+    {
+        backgroundImage.color = normalColor;
+
+        if (DEBUG_Item != null && !ManagersManager.instance.willLoad)
+        {
+            Item item = Instantiate(DEBUG_Item);
+            item.currentStackAmount = Mathf.Min(DEBUG_Amount, item.maxStackAmount);
+
+            SetItem(item);
+
+            return;
+        }
+
         Refresh();
-    }
-
-    private void Update()
-    {
-        if (m_hoverred && 
-            (Mouse.current.leftButton.wasPressedThisFrame ||
-             Mouse.current.rightButton.wasPressedThisFrame ||
-             Mouse.current.middleButton.wasPressedThisFrame))
-        {
-            clicked = true;
-        }
-
-        if (m_hoverred && clicked &&
-            (Mouse.current.leftButton.wasReleasedThisFrame ||
-             Mouse.current.rightButton.wasReleasedThisFrame ||
-             Mouse.current.middleButton.wasReleasedThisFrame))
-        {
-            MouseClickEvent();
-        }
-    }
-
-    private void RefreshColor()
-    {
-        backgroundImage.color = m_hoverred ? hoverColor : normalColor;
-    }
-
-    public void PlayTriggerPop()
-    {
-        animator.SetTrigger("EnterPop");
-    }
-
-    public void MouseEnterEvent()
-    {
-        m_hoverred = true;
-
-        PlayTriggerPop();
-
-        RefreshColor();
-    }
-
-    public void MouseLeaveEvent()
-    {
-        m_hoverred = false;
-        clicked = false;
-
-        RefreshColor();
-    }
-
-    public void SetOwner(Inventory _inventory)
-    {
-        owner = _inventory;
-    }
-
-    public Inventory GetOwner()
-    {
-        return owner;
-    }
-
-    public Item GetItem()
-    {
-        return item;
-    }
-
-    public void Refresh()
-    {
-        amountText.text = string.Empty;
-        itemImage.sprite = null;
-        itemImage.SetAlpha(0);
-        durabilityBarImage.SetAlpha(0);
-        durabilityBarFillImage.SetAlpha(0);
-        amountImage.SetAlpha(0);
-
-        if (item == null)
-            return;
-
-        if (item.currentAmount < 1)
-        {
-            item = null;
-
-            return;
-        }
-
-        itemImage.sprite = item.icon;
-
-        itemImage.SetAlpha(1);
-
-        //Don't show amount icon and text if item is not stackable
-        amountImage.SetAlpha(item.maxStackSize > 1 ? 1 : 0);
-        amountText.text = item.maxStackSize > 1 ? item.currentAmount.ToString() : String.Empty;
-
-        //Don't show durability bar if item is not breakable. Compute it if true
-        durabilityBarImage.SetAlpha(item.hasDurability ? 1 : 0);
-        durabilityBarFillImage.SetAlpha(item.hasDurability ? 1 : 0);
-
-        float normalizedDurability = (float) item.currentDurability / item.maxDurability;
-        durabilityBarFillImage.fillAmount = normalizedDurability;
-        durabilityBarFillImage.color = Color.Lerp(durabilityMinColor, durabilityMaxColor, normalizedDurability);
     }
 
     public void SetItem(Item _item)
     {
-        if (_item)
-            item = _item.Clone();
-        else
-            item = null;
-
-        OnItemChange?.Invoke(); 
+        m_item = _item == null || _item.currentStackAmount <= 0 ? null : Instantiate(_item);
 
         Refresh();
+
+        onSetItem?.Invoke(this);
     }
 
-    public void MouseClickEvent()
+    public void Refresh()
     {
-        if (!owner.IsEnabled)
+        if (m_item == null || m_item.currentStackAmount <= 0)
+        {
+            m_item = null;
+
+            iconImage.sprite = null;
+            iconImage.color = Color.clear;
+            durabilityImage.color = Color.clear;
+            amountText.text = String.Empty;
+            amountText.color = new Color(0, 0, 0, 0);
+
             return;
+        }
 
-        Inventory.InventoryClickEventData data = new Inventory.InventoryClickEventData();
+        iconImage.sprite = m_item.icon;
+        iconImage.color = Color.white;
 
-        data.clickType = GetClickType();
-        data.clickedInventory = owner;
-        data.action = GetAction(data.clickType);
-        data.amount = GetAmount(data.action);
-        data.clickedSlot = this;
-        data.player = owner.Owner;
-        data.cursor = data.player.GetCursor();
-        data.hotbarBtn = -1;
-        data.isCancelled = false;
-        data.view = owner.View;
+        durabilityImage.color = m_item.maxDurability == 0 ? Color.clear : durabilityImageColor;
 
-        owner.InvokeInventoryClick(data);
+        amountText.text = m_item.maxStackAmount == 1 ? String.Empty : m_item.currentStackAmount.ToString();
+        amountText.color = m_item.maxStackAmount == 1 ? Color.clear : Color.white;
     }
 
-    int GetAmount(Inventory.InventoryClickAction action)
+    public void OnPointerEnter()
     {
-        switch (action)
-        {
-            case Inventory.InventoryClickAction.AllToCursor:
-            case Inventory.InventoryClickAction.HalfToCursor:
-            case Inventory.InventoryClickAction.OneToCursor:
-            case Inventory.InventoryClickAction.Fast:
-                return item == null ? 0 :  item.currentAmount;
-
-            case Inventory.InventoryClickAction.PlaceAll:
-            case Inventory.InventoryClickAction.PlaceHalf:
-            case Inventory.InventoryClickAction.PlaceOne:
-                return owner.View.GetCursor().GetItem() == null ? 
-                    0 : owner.View.GetCursor().GetItem().currentAmount;
-
-            default:
-                return 0;
-        }
+        backgroundImage.color = hoverredColor;
     }
 
-    Inventory.InventoryClickAction GetAction(CursorUtilities.ClickType clickType)
+    public void OnPointerExit()
     {
-        if (owner.View.GetCursor().IsEmpty)
-        {
-            if (item == null)
-            {
-                return Inventory.InventoryClickAction.None;
-            }
-
-            switch (clickType)
-            {
-                case CursorUtilities.ClickType.Right:
-                    return Inventory.InventoryClickAction.HalfToCursor;
-                case CursorUtilities.ClickType.Middle:
-                    return Inventory.InventoryClickAction.OneToCursor;
-                case CursorUtilities.ClickType.ShiftLeft:
-                    return Inventory.InventoryClickAction.Fast;
-                case CursorUtilities.ClickType.Left:
-                    return Inventory.InventoryClickAction.AllToCursor;
-                case CursorUtilities.ClickType.ShiftRight:
-                    return Inventory.InventoryClickAction.None;
-                case CursorUtilities.ClickType.None:
-                    return Inventory.InventoryClickAction.None;
-            }
-        }
-        else if (item != null && owner.View.GetCursor().GetItem().id != item.id)
-        {
-            switch (clickType)
-            {
-                case CursorUtilities.ClickType.Right:
-                case CursorUtilities.ClickType.Middle:
-                case CursorUtilities.ClickType.Left:
-                    return Inventory.InventoryClickAction.AllToCursor;
-                case CursorUtilities.ClickType.ShiftLeft:
-                    return Inventory.InventoryClickAction.Fast;
-                case CursorUtilities.ClickType.ShiftRight:
-                case CursorUtilities.ClickType.None:
-                    return Inventory.InventoryClickAction.None;
-            }
-        }
-
-        switch (clickType)
-        {
-            case CursorUtilities.ClickType.Right:
-                return Inventory.InventoryClickAction.PlaceHalf;
-            case CursorUtilities.ClickType.Middle:
-                return Inventory.InventoryClickAction.PlaceOne;
-            case CursorUtilities.ClickType.ShiftLeft:
-                return Inventory.InventoryClickAction.Fast;
-            case CursorUtilities.ClickType.Left:
-                return Inventory.InventoryClickAction.PlaceAll;
-            case CursorUtilities.ClickType.ShiftRight:
-                return Inventory.InventoryClickAction.None;
-            case CursorUtilities.ClickType.None:
-                return Inventory.InventoryClickAction.None;
-        }
-
-        return Inventory.InventoryClickAction.Out;
+        backgroundImage.color = normalColor;
     }
 
-    CursorUtilities.ClickType GetClickType()
+    public void OnPointerClick()
     {
+        Item cursorItem = InventoryController.Instance.cursor.GetItem();
+
         if (Mouse.current.leftButton.wasReleasedThisFrame)
-            if (InputManager.Instance.Input.PlayerGround.Sprint.IsPressed())
-                return CursorUtilities.ClickType.ShiftLeft;
+        {
+            InventoryController.Instance.cursor.HandleStackDelay(this);
+
+            if (m_item == null)
+            {
+                SwapSlots(InventoryController.Instance.cursor.GetSlot());
+
+                CollectStack();
+
+                return;
+            }
+
+            if (InventoryController.Instance.cursor.GetItem() == null)
+            {
+                SwapSlots(InventoryController.Instance.cursor.GetSlot());
+            }
             else
-                return CursorUtilities.ClickType.Left;
+            {
+                if (HasSameItem(InventoryController.Instance.cursor.GetSlot()))
+                {
+                    int toAdd = Mathf.Min(m_item.maxStackAmount - m_item.currentStackAmount, cursorItem.currentStackAmount);
 
-        if (Mouse.current.rightButton.wasReleasedThisFrame)
-            if (InputManager.Instance.Input.PlayerGround.Sprint.IsPressed())
-                return CursorUtilities.ClickType.ShiftRight;
-            else
-                return CursorUtilities.ClickType.Right;
+                    if (toAdd == 0)
+                    {
+                        SwapSlots(InventoryController.Instance.cursor.GetSlot());
 
-        if (Mouse.current.middleButton.wasReleasedThisFrame)
-            return CursorUtilities.ClickType.Middle;
+                        return;
+                    }
 
-        return CursorUtilities.ClickType.None;
+                    m_item.currentStackAmount += toAdd;
+                    cursorItem.currentStackAmount -= toAdd;
+
+                    InventoryController.Instance.cursor.GetSlot().Refresh();
+                    Refresh();
+
+                    onSetItem?.Invoke(this);
+                    InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+                }
+                else
+                {
+                    SwapSlots(InventoryController.Instance.cursor.GetSlot());
+                }
+            }
+
+            return;
+        }
+
+        if (ManagersManager.instance.inputManager.Inputs.PlayerGround.StackOne.WasReleasedThisFrame())
+        {
+            if (m_item == null)
+            {
+                if (cursorItem == null)
+                    return;
+
+                SetItem(cursorItem);
+                m_item.currentStackAmount = 1;
+                cursorItem.currentStackAmount--;
+
+                InventoryController.Instance.cursor.GetSlot().Refresh();
+                Refresh();
+
+                onSetItem?.Invoke(this);
+                InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+
+                return;
+            }
+
+            if (cursorItem == null)
+            {
+                InventoryController.Instance.cursor.GetSlot().SetItem(m_item);
+                InventoryController.Instance.cursor.GetItem().currentStackAmount = 1;
+                InventoryController.Instance.cursor.GetSlot().Refresh();
+                m_item.currentStackAmount--;
+
+                InventoryController.Instance.cursor.GetSlot().Refresh();
+                Refresh();
+
+                onSetItem?.Invoke(this);
+                InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+
+                return;
+            }
+
+            if (!HasSameItem(InventoryController.Instance.cursor.GetSlot()) || m_item.currentStackAmount >= m_item.maxStackAmount)
+                return;
+
+            m_item.currentStackAmount++;
+            cursorItem.currentStackAmount--;
+
+            InventoryController.Instance.cursor.GetSlot().Refresh();
+            Refresh();
+            
+            onSetItem?.Invoke(this);
+            InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+
+            return;
+        }
+
+        if (ManagersManager.instance.inputManager.Inputs.PlayerGround.StackHalf.WasReleasedThisFrame())
+        {
+            int amount;
+
+            if (m_item == null)
+            {
+                if (cursorItem == null)
+                    return;
+
+                amount = cursorItem.currentStackAmount / 2;
+
+                SetItem(cursorItem);
+                m_item.currentStackAmount = amount;
+                cursorItem.currentStackAmount -= amount;
+                
+                InventoryController.Instance.cursor.GetSlot().Refresh();
+                Refresh();
+
+                onSetItem?.Invoke(this);
+                InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+
+                return;
+            }
+
+            if (cursorItem == null)
+            {
+                amount = m_item.currentStackAmount / 2;
+
+                InventoryController.Instance.cursor.GetSlot().SetItem(m_item);
+                InventoryController.Instance.cursor.GetItem().currentStackAmount = amount;
+                InventoryController.Instance.cursor.GetSlot().Refresh();
+                m_item.currentStackAmount -= amount;
+
+                InventoryController.Instance.cursor.GetSlot().Refresh();
+                Refresh();
+                
+                onSetItem?.Invoke(this);
+                InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+
+                return;
+            }
+
+            if (!HasSameItem(InventoryController.Instance.cursor.GetSlot()) || m_item.currentStackAmount >= m_item.maxStackAmount)
+                return;
+
+            amount = Mathf.Min(Mathf.Max(cursorItem.currentStackAmount / 2, 1), m_item.maxStackAmount - m_item.currentStackAmount);
+
+            m_item.currentStackAmount += amount;
+            cursorItem.currentStackAmount -= amount;
+
+            InventoryController.Instance.cursor.GetSlot().Refresh();
+            Refresh();
+            
+            onSetItem?.Invoke(this);
+            InventoryController.Instance.cursor.GetSlot().onSetItem?.Invoke(InventoryController.Instance.cursor.GetSlot());
+
+            return;
+        }
+    }
+
+    public void StartCollectStack()
+    {
+        m_willStackAll = true;
+    }
+
+    public void CollectStack()
+    {
+        if (m_willStackAll)
+        {
+            InventoryController.Instance.inventory.StackAllInSlot(this);
+            SwapSlots(InventoryController.Instance.cursor.GetSlot());
+        }
+
+        m_willStackAll = false;
+    }
+
+    public void SwapSlots(Slot _to)
+    {
+        Item temp = GetItem();
+        SetItem(_to.GetItem());
+        _to.SetItem(temp);
+    }
+
+    public Item GetItem()
+    {
+        return m_item;
+    }
+
+    public bool HasSameItem(Slot _slot)
+    {
+        return m_item != null && _slot.GetItem() != null && (m_item.id == _slot.GetItem().id);
+    }
+
+    public Vector3 GetPosition()
+    {
+        return GetComponent<Image>().rectTransform.anchoredPosition;
+    }
+
+    public SlotData CreateSaveData()
+    {
+        SlotData data = new SlotData();
+
+        if (!Empty)
+        {
+            data.item = m_item.CreateSaveData();
+        }
+        else
+        {
+            data.item.id = "";
+        }
+
+        return data;
+    }
+
+    public void ReadSaveData(SlotData _data)
+    {
+        SetItem(null);
+
+        if (_data.item.id != "")
+        {
+            Item item = Item.ReadSaveData(_data.item);
+
+            SetItem(item);
+        }
     }
 }
